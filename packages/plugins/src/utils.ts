@@ -17,7 +17,7 @@ export function createPlugin<
 }
 
 export function approve<T extends ApproveMode>({ approveMode, getWallet }: { approveMode: T } & SwapKitPluginParams) {
-  return function approve(params: { spenderAddress: string; assetValue: AssetValue; route?: QuoteResponseRoute }) {
+  return function approve(params: { spenderAddress?: string; assetValue: AssetValue; route?: QuoteResponseRoute }) {
     return match(params)
       .with({ route: P.not(P.nullish) }, async ({ route }) => {
         const assetValue = AssetValue.from({ asset: route.sellAsset, value: route.sellAmount });
@@ -67,7 +67,7 @@ export function approve<T extends ApproveMode>({ approveMode, getWallet }: { app
           amount: assetValue.getBaseValue("bigint"),
           assetAddress: assetValue.address,
           from: wallet.address,
-          spenderAddress,
+          spenderAddress: spenderAddress || getWallet(evmChain).address,
         });
       });
   };
